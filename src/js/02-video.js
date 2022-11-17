@@ -1,31 +1,15 @@
 import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
-
+import { saveLocalStorage, loadLocalStorage } from './dzApi';
 const iframe = document.querySelector('iframe');
 const player = new Player(iframe);
 
-const saveLocalStorage = (key, value) => {
-  try {
-    const serializedState = JSON.stringify(value);
-    localStorage.setItem(key, serializedState);
-  } catch (error) {
-    console.error('Set state error: ', error.message);
-  }
-};
-
-const loadLocalStorage = key => {
-  try {
-    const serializedState = localStorage.getItem(key);
-    return JSON.parse(serializedState) || 0;
-  } catch (error) {
-    console.error('Get state error: ', error.message);
-  }
-};
+const LOCALSTORAGE_KEY = 'videoplayer-current-time';
 
 player.on(
   'timeupdate',
   throttle(({ seconds }) => {
-    saveLocalStorage('videoplayer-current-time', seconds);
+    saveLocalStorage(LOCALSTORAGE_KEY, seconds);
   }, 500)
 );
-player.setCurrentTime(loadLocalStorage('videoplayer-current-time'));
+player.setCurrentTime(loadLocalStorage(LOCALSTORAGE_KEY));
